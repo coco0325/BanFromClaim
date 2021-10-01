@@ -5,7 +5,7 @@
 
 	<groupId>no.vestlandetmc.bfc</groupId>
 	<artifactId>BanFromClaim</artifactId>
-	<version>1.4</version>
+	<version>1.5.11</version>
 	<packaging>jar</packaging>
 
 	<name>BanFromClaim</name>
@@ -36,13 +36,14 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.5-R0.1-SNAPSHOT</version>
+			<version>1.17.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.TechFortress</groupId>
 			<artifactId>GriefPrevention</artifactId>
-			<version>16.11.6</version>
+			<version>16.17.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>tk.shanebee</groupId>

@@ -1,4 +1,4 @@
-package no.vestlandetmc.BanFromClaim.commands;
+package no.vestlandetmc.BanFromClaim.commands.griefprevention;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,12 +21,11 @@ public class BfclistCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!(sender instanceof Player)) {
+		if(!(sender instanceof final Player player)) {
 			MessageHandler.sendConsole("&cThis command can only be used in-game.");
 			return true;
 		}
 
-		final Player player = (Player) sender;
 		final Location loc = player.getLocation();
 		final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, true, null);
 

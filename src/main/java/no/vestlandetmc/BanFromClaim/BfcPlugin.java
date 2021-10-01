@@ -10,14 +10,25 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import no.vestlandetmc.BanFromClaim.commands.BfcCommand;
-import no.vestlandetmc.BanFromClaim.commands.BfclistCommand;
-import no.vestlandetmc.BanFromClaim.commands.UnbfcCommand;
+import no.vestlandetmc.BanFromClaim.commands.SafeSpot;
+import no.vestlandetmc.BanFromClaim.commands.griefdefender.BfcAllCommandGD;
+import no.vestlandetmc.BanFromClaim.commands.griefdefender.BfcCommandGD;
+import no.vestlandetmc.BanFromClaim.commands.griefdefender.BfclistCommandGD;
+import no.vestlandetmc.BanFromClaim.commands.griefdefender.UnbfcCommandGD;
+import no.vestlandetmc.BanFromClaim.commands.griefprevention.BfcAllCommand;
+import no.vestlandetmc.BanFromClaim.commands.griefprevention.BfcCommand;
+import no.vestlandetmc.BanFromClaim.commands.griefprevention.BfclistCommand;
+import no.vestlandetmc.BanFromClaim.commands.griefprevention.UnbfcCommand;
 import no.vestlandetmc.BanFromClaim.config.ClaimData;
+import no.vestlandetmc.BanFromClaim.config.Config;
 import no.vestlandetmc.BanFromClaim.config.Messages;
+import no.vestlandetmc.BanFromClaim.handler.CombatScheduler;
 import no.vestlandetmc.BanFromClaim.handler.MessageHandler;
 import no.vestlandetmc.BanFromClaim.handler.UpdateNotification;
-import no.vestlandetmc.BanFromClaim.listener.BfcListener;
+import no.vestlandetmc.BanFromClaim.listener.CombatMode;
+import no.vestlandetmc.BanFromClaim.listener.GDListener;
+import no.vestlandetmc.BanFromClaim.listener.GPListener;
+import no.vestlandetmc.BanFromClaim.listener.PlayerListener;
 
 public class BfcPlugin extends JavaPlugin {
 
@@ -42,21 +53,42 @@ public class BfcPlugin extends JavaPlugin {
 		if(getServer().getPluginManager().getPlugin("GriefPrevention") != null) {
 			MessageHandler.sendConsole("&2[" + getDescription().getPrefix() + "] &7Successfully hooked into &eGriefPrevention");
 			MessageHandler.sendConsole("");
+
+			this.getServer().getPluginManager().registerEvents(new GPListener(), this);
+			this.getCommand("banfromclaim").setExecutor(new BfcCommand());
+			this.getCommand("unbanfromclaim").setExecutor(new UnbfcCommand());
+			this.getCommand("banfromclaimlist").setExecutor(new BfclistCommand());
+			this.getCommand("banfromclaimall").setExecutor(new BfcAllCommand());
+
+		} else if(getServer().getPluginManager().getPlugin("GriefDefender") != null) {
+			MessageHandler.sendConsole("&2[" + getDescription().getPrefix() + "] &7Successfully hooked into &eGriefDefender");
+			MessageHandler.sendConsole("");
+
+			this.getServer().getPluginManager().registerEvents(new GDListener(), this);
+			this.getCommand("banfromclaim").setExecutor(new BfcCommandGD());
+			this.getCommand("unbanfromclaim").setExecutor(new UnbfcCommandGD());
+			this.getCommand("banfromclaimlist").setExecutor(new BfclistCommandGD());
+			this.getCommand("banfromclaimall").setExecutor(new BfcAllCommandGD());
+
 		} else {
-			MessageHandler.sendConsole("&2[" + getDescription().getPrefix() + "] &cGriefPrevention was not found! Please add GriefPrevention.");
+			MessageHandler.sendConsole("&2[" + getDescription().getPrefix() + "] &cNo supported claimsystem was found.");
 			MessageHandler.sendConsole("");
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
 
-		this.getCommand("banfromclaim").setExecutor(new BfcCommand());
-		this.getCommand("unbanfromclaim").setExecutor(new UnbfcCommand());
-		this.getCommand("banfromclaimlist").setExecutor(new BfclistCommand());
-		this.getServer().getPluginManager().registerEvents(new BfcListener(), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		this.getCommand("bfcsafespot").setExecutor(new SafeSpot());
 
 		createDatafile();
 		Messages.initialize();
+		Config.initialize();
 		ClaimData.createSection();
+
+		if(Config.COMBAT_ENABLED) {
+			this.getServer().getPluginManager().registerEvents(new CombatMode(), this);
+			new CombatScheduler().runTaskTimer(this, 0L, 20L);
+		}
 
 		new BukkitRunnable() {
 			@Override
@@ -64,7 +96,7 @@ public class BfcPlugin extends JavaPlugin {
 				ClaimData.cleanDatafile();
 			}
 
-		}.runTaskTimer(this, (30 * 20L), (3600 * 20L));
+		}.runTaskTimer(this, 30 * 20L, 3600 * 20L);
 
 		new UpdateNotification(70897) {
 

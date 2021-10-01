@@ -1,4 +1,4 @@
-package no.vestlandetmc.BanFromClaim.commands;
+package no.vestlandetmc.BanFromClaim.commands.griefprevention;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,12 +18,11 @@ public class BfcCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!(sender instanceof Player)) {
+		if(!(sender instanceof final Player player)) {
 			MessageHandler.sendConsole("&cThis command can only be used in-game.");
 			return true;
 		}
 
-		final Player player = (Player) sender;
 		final Location loc = player.getLocation();
 		final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, true, null);
 
@@ -43,7 +42,7 @@ public class BfcCommand implements CommandExecutor {
 
 		if(player.hasPermission("bfc.admin")) { allowBan = true; }
 
-		if(!bannedPlayer.hasPlayedBefore() && !bannedPlayer.isOnline()) {
+		if(!bannedPlayer.hasPlayedBefore()) {
 			MessageHandler.sendMessage(player, Messages.placeholders(Messages.UNVALID_PLAYERNAME, args[0], player.getDisplayName(), null));
 			return true;
 		} else if(bannedPlayer.getName().equals(player.getName())) {
@@ -52,6 +51,13 @@ public class BfcCommand implements CommandExecutor {
 		} else if(bannedPlayer.getName().equals(claim.getOwnerName())) {
 			MessageHandler.sendMessage(player, Messages.BAN_OWNER);
 			return true;
+		}
+
+		if(bannedPlayer.isOnline()) {
+			if(bannedPlayer.getPlayer().hasPermission("bfc.bypass")) {
+				MessageHandler.sendMessage(player, Messages.placeholders(Messages.PROTECTED, bannedPlayer.getPlayer().getDisplayName(), null, null));
+				return true;
+			}
 		}
 
 		if(!allowBan) {
@@ -70,12 +76,12 @@ public class BfcCommand implements CommandExecutor {
 					}
 
 				}
+
 				MessageHandler.sendMessage(player, Messages.placeholders(Messages.BANNED, bannedPlayer.getName(), null, null));
 
 			} else {
 				MessageHandler.sendMessage(player, Messages.ALREADY_BANNED);
 			}
-
 		}
 		return true;
 	}
