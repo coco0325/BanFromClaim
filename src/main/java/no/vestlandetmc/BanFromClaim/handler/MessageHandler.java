@@ -11,7 +11,7 @@ import no.vestlandetmc.BanFromClaim.BfcPlugin;
 
 public class MessageHandler {
 
-	public static ArrayList<String> spamMessageClaim = new ArrayList<>();
+	public static ArrayList<String> joinignore = new ArrayList<>();
 
 	public static void sendAction(Player player, String message) {
 		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(colorize(message)));
@@ -34,13 +34,12 @@ public class MessageHandler {
 	}
 
 	public static String placeholders(String message, String time, String tpName, String tp1, String tp2) {
-		final String converted = message.
+
+		return message.
 				replaceAll("%time%", time).
 				replaceAll("%tpname%", tpName).
 				replaceAll("%teleport1%", tp1).
 				replaceAll("%teleport2%", tp2);
-
-		return converted;
 
 	}
 

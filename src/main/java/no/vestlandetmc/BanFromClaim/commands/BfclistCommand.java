@@ -19,10 +19,6 @@ import no.vestlandetmc.BanFromClaim.handler.MessageHandler;
 
 public class BfclistCommand implements CommandExecutor {
 
-	int countTo = 5;
-	int countFrom = 0;
-	int number = 1;
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -34,11 +30,45 @@ public class BfclistCommand implements CommandExecutor {
 		final Location loc = player.getLocation();
 		final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, true, null);
 
+		if(claim == null) {
+			MessageHandler.sendMessage(player, Messages.OUTSIDE_CLAIM);
+			return true;
+		}
+
+		final String accessDenied = claim.allowGrantPermission(player);
+		boolean allowBan = accessDenied == null;
+
+		if(player.hasPermission("bfc.admin")) { allowBan = true; }
+
+		if(!allowBan) {
+			MessageHandler.sendMessage(player, Messages.NO_ACCESS);
+			return true;
+		}
+
+		List<String> list = listPlayers(claim.getID().toString());
+
+		if(list == null) {
+			MessageHandler.sendMessage(player, Messages.placeholders(Messages.LIST_EMPTY, null, player.getDisplayName(), claim.getOwnerName()));
+			return true;
+		}
+
+		int size = list.size();
+
+		int totalPage = ((size - 1) / 5) + 1;
+
+		int countTo = Math.min(5, size) - 1;
+		int countFrom = 0;
+		int number = 1;
+
 		if(args.length != 0) {
 			if(isInt(args[0])) {
-				this.number = Integer.parseInt(args[0]);
-				this.countTo = 5 * number;
-				this.countFrom = (5 * number) - 5;
+				number = Integer.parseInt(args[0]);
+				if(number <= totalPage && number > 0){
+					countTo = Math.min(5 * number, size) - 1;
+					countFrom = 5 * number - 5;
+				}else{
+					number = 1;
+				}
 			}
 			else {
 				MessageHandler.sendMessage(player, Messages.UNVALID_NUMBER);
@@ -46,58 +76,14 @@ public class BfclistCommand implements CommandExecutor {
 			}
 		}
 
-		if(claim == null) {
-			MessageHandler.sendMessage(player, Messages.OUTSIDE_CLAIM);
-			return true;
+		MessageHandler.sendMessage(player, Messages.placeholders(Messages.LIST_HEADER, null, player.getDisplayName(), claim.getOwnerName()));
+		for(int i = countFrom; i <= countTo; i++) {
+			final String bp = (String) list.toArray()[i];
+			final OfflinePlayer bannedPlayer = Bukkit.getOfflinePlayer(UUID.fromString(bp));
+			MessageHandler.sendMessage(player, "&6" + bannedPlayer.getName());
 		}
-
-		final String accessDenied = claim.allowGrantPermission(player);
-		boolean allowBan = false;
-
-		if(accessDenied == null) { allowBan = true; }
-		if(player.hasPermission("bfc.admin")) { allowBan = true; }
-
-		int totalPage = 1;
-
-		if(!allowBan) {
-			MessageHandler.sendMessage(player, Messages.NO_ACCESS);
-			return true;
-
-		} else {
-			MessageHandler.sendMessage(player, Messages.placeholders(Messages.LIST_HEADER, null, player.getDisplayName(), claim.getOwnerName()));
-			if(listPlayers(claim.getID().toString()) == null) {
-				MessageHandler.sendMessage(player, Messages.placeholders(Messages.LIST_EMPTY, null, player.getDisplayName(), claim.getOwnerName()));
-				return true;
-			} else {
-				totalPage = (listPlayers(claim.getID().toString()).size() / 5) + 1;
-				for(int i = 0; i < listPlayers(claim.getID().toString()).toArray().length; i++) {
-					if(this.number > totalPage || this.number == 0) {
-						this.countTo = 5 * totalPage;
-						this.countFrom = (5 * totalPage) - 5;
-						this.number = totalPage;
-					}
-
-					if(i >= this.countFrom) {
-						final String bp = (String) listPlayers(claim.getID().toString()).toArray()[i];
-						final OfflinePlayer bannedPlayer = Bukkit.getOfflinePlayer(UUID.fromString(bp));
-						MessageHandler.sendMessage(player, "&6" + bannedPlayer.getName());
-
-						if(i == this.countTo) {
-							MessageHandler.sendMessage(player, "");
-							MessageHandler.sendMessage(player, "&e<--- [&6" + this.number + "\\" + totalPage + "&e] --->");
-							break;
-						}
-
-						continue;
-					}
-				}
-
-				if(this.number == totalPage) {
-					MessageHandler.sendMessage(player, "");
-					MessageHandler.sendMessage(player, "&e<--- [&6" + totalPage + "\\" + totalPage + "&e] --->");
-				}
-			}
-		}
+		MessageHandler.sendMessage(player, "");
+		MessageHandler.sendMessage(player, "&e<--- [&6" + number + "\\" + totalPage + "&e] --->");
 
 		return true;
 	}

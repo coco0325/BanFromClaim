@@ -19,7 +19,7 @@ import no.vestlandetmc.BanFromClaim.BfcPlugin;
 public class ConfigHandler extends YamlConfiguration {
 
 	private final File file;
-	private YamlConfiguration defaults;
+	private final YamlConfiguration defaults;
 	private String pathPrefix;
 
 	public ConfigHandler(String fileName) {

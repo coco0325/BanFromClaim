@@ -13,8 +13,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>16</maven.compiler.source>
+		<maven.compiler.target>16</maven.compiler.target>
 	</properties>
 
 	<repositories>
@@ -36,13 +36,20 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.1-R0.1-SNAPSHOT</version>
+			<version>1.16.5-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.TechFortress</groupId>
 			<artifactId>GriefPrevention</artifactId>
 			<version>16.11.6</version>
+		</dependency>
+		<dependency>
+			<groupId>tk.shanebee</groupId>
+			<artifactId>GriefPreventionFlags</artifactId>
+			<version>5.10.0</version>
+			<scope>system</scope>
+			<systemPath>C:/Users/Coco/Documents/JAVA Projects/GriefPreventionFlags/target/GriefPreventionFlags-5.10.0.jar</systemPath>
 		</dependency>
 	</dependencies>
 	<build>

@@ -23,7 +23,6 @@ public class BfcPlugin extends JavaPlugin {
 
 	public static BfcPlugin instance;
 
-	private File dataFile;
 	private FileConfiguration data;
 
 	public static BfcPlugin getInstance() {
@@ -89,7 +88,7 @@ public class BfcPlugin extends JavaPlugin {
 	}
 
 	public void createDatafile() {
-		dataFile = new File(this.getDataFolder(), "data.dat");
+		File dataFile = new File(this.getDataFolder(), "data.dat");
 		if (!dataFile.exists()) {
 			dataFile.getParentFile().mkdirs();
 			try {

@@ -14,7 +14,6 @@ import no.vestlandetmc.BanFromClaim.handler.MessageHandler;
 
 public class ClaimData {
 
-	private static File file;
 	private final FileConfiguration cfg = BfcPlugin.getInstance().getDataFile();
 	private final String prefix = "bfc_claim_data";
 
@@ -108,7 +107,7 @@ public class ClaimData {
 
 	private static void saveDatafile() {
 		try {
-			file = new File(BfcPlugin.getInstance().getDataFolder(), "data.dat");
+			File file = new File(BfcPlugin.getInstance().getDataFolder(), "data.dat");
 			BfcPlugin.getInstance().getDataFile().save(file);
 		} catch (final IOException e) {
 			e.printStackTrace();

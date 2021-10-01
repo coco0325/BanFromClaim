@@ -53,7 +53,4 @@ public abstract class UpdateNotification extends BukkitRunnable {
 		return latestVersion;
 	}
 
-	public static String getCurrentVersion() {
-		return BfcPlugin.getInstance().getDescription().getVersion();
-	}
 }
