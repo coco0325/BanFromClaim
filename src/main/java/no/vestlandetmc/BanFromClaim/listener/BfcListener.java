@@ -42,29 +42,17 @@ public class BfcListener implements Listener {
 		final Player player = p.getPlayer();
 		if(player.hasPermission("bfc.bypass")) return;
 
-		MessageHandler.joinignore.add(player.getUniqueId().toString());
-		new BukkitRunnable(){
-			@Override
-			public void run(){
-				final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
+		final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
 
-				if(claim != null) {
-					final String claimID = claim.getID().toString();
-					if(playerBanned(player, claimID)) {
-						Particles.wall(player.getLocation());
+		if(claim != null) {
+			final String claimID = claim.getID().toString();
+			if(playerBanned(player, claimID)) {
+				Particles.wall(player.getLocation());
 
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "cmi spawn " + player.getName());
-						MessageHandler.sendTitle(player, Messages.TITLE_MESSAGE, Messages.SUBTITLE_MESSAGE);
-						new BukkitRunnable(){
-							@Override
-							public void run(){
-								MessageHandler.joinignore.remove(player.getUniqueId().toString());
-							}
-						}.runTaskLater(BfcPlugin.getInstance(), 1L);
-					}
-				}
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "cmi spawn " + player.getName());
+				MessageHandler.sendTitle(player, Messages.TITLE_MESSAGE, Messages.SUBTITLE_MESSAGE);
 			}
-		}.runTaskLater(BfcPlugin.getInstance(), 22L);
+		}
 	}
 
 	private boolean playerBanned(Player player, String claimID) {
